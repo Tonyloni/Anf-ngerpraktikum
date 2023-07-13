@@ -140,7 +140,7 @@ double localDijkstra(Graph_ch2* g, int target, double dist_sc, double maxPath, A
             break;
         }
 
-        if (hoplimit == 500) {
+        if (hoplimit == 400) {
             return dist_sc+1;
         }
         //relaxation
@@ -390,12 +390,12 @@ void contractionHierarchy(Graph_ch2* g) {
         if (i % 1000 == 0) {
         std::cout << i << std::endl;
         std::cout << "num_sc: " << num_sc << std::endl;
-        std::cout << "time_ls: " << time_ls << std::endl;
+        /*std::cout << "time_ls: " << time_ls << std::endl;
         std::cout << "time1: " << time1 << std::endl;
         std::cout << "time2: " << time2 << std::endl;
         std::cout << "time3: " << time3 << std::endl;
         std::cout << "time4: " << time4 << std::endl;
-        std::cout << "timebtw: " << time_btw << std::endl;
+        std::cout << "timebtw: " << time_btw << std::endl;*/
 
         time_ls = 0;
         time3 = 0;

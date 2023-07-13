@@ -112,7 +112,7 @@ target_node = rand()%g1->getNumNodes()+1;
 
   
     auto start_time_query_normal = std::chrono::high_resolution_clock::now();
-    std::pair<std::vector<int>, double> path_normal = bidirec_dijkstra2(g1, source_node-1, target_node-1);
+    std::pair<std::vector<int>, double> path_normal = dijkstra(g1, source_node-1, target_node-1);
     auto end_time_query_normal = std::chrono::high_resolution_clock::now();
     auto duration_query_normal = std::chrono::duration_cast<std::chrono::milliseconds>(end_time_query_normal - start_time_query_normal).count();
     times_normal.push_back(duration_query_normal/1000.0);
@@ -122,7 +122,6 @@ target_node = rand()%g1->getNumNodes()+1;
 
     //double distance_ch = modifiedBidirectional(g2, source_node-1, target_node-1);
     auto start_time_query_ch = std::chrono::high_resolution_clock::now();
-
     std::pair<std::vector<int>, double> path_ch = bidirec_dijkstra(g2, source_node-1, target_node-1);
     auto end_time_query_ch = std::chrono::high_resolution_clock::now();
     auto duration_query_ch = std::chrono::duration_cast<std::chrono::milliseconds>(end_time_query_ch - start_time_query_ch).count();
@@ -153,7 +152,7 @@ if(std::abs( path_normal.second- path_ch.second)>1e-5&&path_normal.second!=0.0){
       std::cout<<"AVG normal "<< std::accumulate(times_normal.begin(),times_normal.end(),0.0)/times_normal.size()<<std::endl;
       std::cout<<"AVG ch "<< std::accumulate(times_ch.begin(),times_ch.end(),0.0)/times_ch.size()<<std::endl;
         std::cout<<"GEO normal "<< exp(std::transform_reduce(times_normal.begin(),times_normal.end(),0.0,[](auto a,auto b){return a+b;},[](auto a){return log(a+0.00001);})/times_normal.size())<<std::endl;
-      std::cout<<"GEO ch "<< exp(std::transform_reduce(times_ch.begin(),times_ch.end(),0.0,[](auto a,auto b){return a+b;},[](auto a){return log(a+0.00001);})/times_normal.size())<<std::endl;
+      std::cout<<"GEO ch "<< exp(std::transform_reduce(times_ch.begin(),times_ch.end(),0.0,[](auto a,auto b){return a+b;},[](auto a){return log(a+0.00001);})/times_ch.size())<<std::endl;
     //std::cout << "distance: " << path_ch.second << std::endl;
     //double path_ch = bidirec_dijkstra2(g1, source_node-1, target_node-1);
 

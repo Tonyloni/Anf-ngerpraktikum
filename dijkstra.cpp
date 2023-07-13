@@ -8,6 +8,7 @@
 #include "graph_ch.h"
 #include "graph.h"
 #include "graph_ch2.h"
+#include "minheap.h"
 
 int num_er = 0;
 
@@ -38,14 +39,15 @@ std::vector<int> reconstructPathDijkstra(const std::vector<int>& pred, int sourc
 
 
 
-std::vector<int> dijkstra(Graph_ch* g, int source, int target) {
+std::pair<std::vector<int>, double> dijkstra(Graph_ch2* g, int source, int target) {
 
     //when accessing the d array, there has to be -1 to match the index of the graph file (there is no node 0)
 
     int n = g->getNumNodes();
 
     //create a priority queue where the element type is the node id (int) and the key is the distance, d[i] (double)
-    Adr_PriorityQueue<int, double>* p = new Adr_PriorityQueue<int, double>();
+    //Adr_PriorityQueue<int, double>* p = new Adr_PriorityQueue<int, double>();
+    MinHeap* p = new MinHeap();
 
     std::vector<double> d(n, INFINITY);
     std::vector<int> parent(n, -1);
@@ -66,41 +68,36 @@ std::vector<int> dijkstra(Graph_ch* g, int source, int target) {
         if (u == target) {
             break;
         }
+        Node_ch2* node_u = g->getNode(u);
 
-        //relaxation
-        for (int i = 0; i < g->getNode(u)->adj_nodes; i++) {
-            Edge* v = g->getEdge(g->getNode(u)->index + i);
+        Range<std::vector<Edge_ch>::iterator> range_edges_u(node_u->edges.begin() + node_u->second_index, node_u->edges.end());
+        for (auto& v : range_edges_u) { 
+            if ((d[u] + v.weight) < d[v.target]) {
+                d[v.target] = d[u] + v.weight;
+                parent[v.target] = u;
 
-            if ((d[u] + v->weight) < d[v->target]) {
-                d[v->target] = d[u] + v->weight;
-                parent[v->target] = u;
-
-                if (p->isElementOf(v->target)) {
-                    p->updateKey(v->target, d[v->target]);
+                if (p->isElementOf(v.target)) {
+                    p->updateKey(v.target, d[v.target]);
                 }
                 else {
-                    p->insert(v->target, d[v->target]);
+                    p->insert(v.target, d[v.target]);
                 }
 
             }
-
-
         }
     }
-
-    double target_dist = d[target];
-
+    if (d[target] == INFINITY) {
+        return {std::vector<int>(), d[target]};
+    }
     std::vector<int> shortest_path = reconstructPathDijkstra(parent, source, target);
 
     //delete[] d;
 
     //std::cout <<  "distance to target: " << target_dist << std::endl;
 
-    return shortest_path;
-
+    //return shortest_path;
+    return {shortest_path, d[target]};
 }
-
-
 /*
 
 double dijkstra_ch(Graph_ch* g, int source, int target, double d_sc) { //modified dijkstra for local search
@@ -192,6 +189,10 @@ std::vector<int> reconstructPathBidirecDijkstra(const std::vector<int>& pred_f, 
     std::vector<int> path;
     int currentNode;
 
+    if (meetingNode == -1) {
+        return path;
+    }
+
     // Reconstruct path from source to meetingNode
     currentNode = meetingNode;
     while (currentNode != source) {
@@ -224,8 +225,11 @@ std::pair<std::vector<int>, double> bidirec_dijkstra2(Graph_ch2* g, int source, 
     int n = g->getNumNodes();
 
     //create two pq, one for forward search, one for backward search
-    Adr_PriorityQueue<int, double>* p_f = new Adr_PriorityQueue<int, double>();
-    Adr_PriorityQueue<int, double>* p_b = new Adr_PriorityQueue<int, double>();
+    /*Adr_PriorityQueue<int, double>* p_f = new Adr_PriorityQueue<int, double>();
+    Adr_PriorityQueue<int, double>* p_b = new Adr_PriorityQueue<int, double>();*/
+
+    MinHeap* p_f = new MinHeap();
+    MinHeap* p_b = new MinHeap();
 
     //two distance arrays
     std::vector<double> d_f(n, INFINITY);    //double* d = new double[n];
@@ -315,6 +319,9 @@ std::pair<std::vector<int>, double> bidirec_dijkstra(Graph_ch* g, int source, in
     //create two pq, one for forward search, one for backward search
     Adr_PriorityQueue<int, double>* p_f = new Adr_PriorityQueue<int, double>();
     Adr_PriorityQueue<int, double>* p_b = new Adr_PriorityQueue<int, double>();
+    
+    //MinHeap* p_f = new MinHeap();
+    //MinHeap* p_b = new MinHeap();
 
     //two distance arrays
     std::vector<double> d_f(n, INFINITY);    //double* d = new double[n];
